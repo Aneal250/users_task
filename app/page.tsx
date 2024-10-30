@@ -10,19 +10,37 @@ import { useEffect, useRef, useState } from "react";
 import PrimaryButton from "@components/common/PrimaryButton";
 import AddUserModal from "@components/modal/AddUserModal";
 import { useAppSelector, useAppDispatch } from "@lib/hooks";
-import { addUser, fetchUsers, searchUsersByNameOrEmail, users } from "../src/features/usersSlice";
+import {
+  addUser,
+  fetchUsers,
+  searchUsersByNameOrEmail,
+  users,
+} from "../src/features/usersSlice";
+import UserModal from "@components/modal/UserModal";
 
 export default function Home() {
   const { data: usersData, isLoading: isLoadingUsers } = useGetUsers();
 
   const [showAddUserModal, setShowAddUserModal] = useState<boolean>(false);
+  const [showViewUserModal, setShowViewUserModal] = useState<boolean>(false);
+
+  const [selectedUser, setSelectedUser] = useState<User | null>();
 
   const [search, setSearch] = useState("");
 
+  const handleViewUser = (user: User) => {
+    setSelectedUser(user);
+  };
+
+  const handleCloseViewUser = () => {
+    setSelectedUser(null);
+    setShowViewUserModal(false);
+  };
+
   const columns: TableColumn<User>[] = [
     {
-      header: "S/N",
-      cell: (item) => item.id,
+      header: "ID",
+      cell: (item) => <div className="flex items-center gap-2">{item.id}</div>,
     },
     {
       header: "Name",
@@ -49,37 +67,63 @@ export default function Home() {
         <div className="capitalize text-sub-text">{item.website}</div>
       ),
     },
+    {
+      header: "Action",
+      cell: (item) => (
+        <button
+          type="button"
+          className="bg-red-500 rounded-md text-11 h-4 flex items-center justify-center text-white px-2 py-3 cursor-pointer"
+          onClick={() => {
+            setSelectedUser(item);
+            setShowViewUserModal(true);
+          }}
+        >
+          View User
+        </button>
+      ),
+    },
   ];
 
   const dispatch = useAppDispatch();
 
   const usersList = useAppSelector(users);
 
-   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const handleSearch = (value: string) => {
+    setSearch(value);
 
-  // help me fix this
-    const handleSearch = (value: string) => {
-      setSearch(value); // Update search state immediately
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
 
-      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-
-      searchTimeoutRef.current = setTimeout(() => {
+    searchTimeoutRef.current = setTimeout(() => {
+      if (value.trim()) {
+        // Search if value is non-empty
         dispatch(searchUsersByNameOrEmail(value));
-      }, 300);
-    };
+      } else {
+        // Fetch all users if search is cleared
+        if (usersData) dispatch(fetchUsers(usersData));
+      }
+    }, 300);
+  };
 
   const handleAddUser = (user: AddUser) => {
-    dispatch(addUser(user)); 
+    dispatch(addUser(user));
     setShowAddUserModal(false);
+  };
+
+  // Clear search and reset users data
+  const clearSearch = () => {
+    setSearch("");
+    if (usersData) {
+      dispatch(fetchUsers(usersData));
+    }
   };
 
   useEffect(() => {
     if (usersData) {
-      dispatch(fetchUsers(usersData)); 
+      dispatch(fetchUsers(usersData));
     }
   }, [dispatch, usersData]);
-
 
   return (
     <>
@@ -91,26 +135,45 @@ export default function Home() {
         />
       )}
 
+      {showViewUserModal && selectedUser && (
+        <UserModal
+          open={showViewUserModal}
+          onClose={() => handleCloseViewUser()}
+          selectedUser={selectedUser}
+        />
+      )}
+
       <div className="h-screen mx-auto bg-grey-bg px-8 py-12">
         <div className=" rounded-[15px] bg-white px-8 py-4">
           <p className="font-semibold">All Users</p>
           <div className="mt-6 flex items-center justify-center">
             <SearchInput
-              placeholder="Search by name"
+              placeholder="Search by name or email"
               value={search}
               onChange={(e) => handleSearch(e.target.value)}
-              
             />
 
-            <PrimaryButton onClick={() => setShowAddUserModal(true)}>
-              Add User
-            </PrimaryButton>
+            <div className="flex gap-2">
+              {/* please help me implement clear search properly */}
+              {search.trim().length > 0 && (
+                <PrimaryButton
+                  onClick={clearSearch}
+                  variant="blueOutline"
+                  className=""
+                >
+                  Clear search
+                </PrimaryButton>
+              )}
+              <PrimaryButton onClick={() => setShowAddUserModal(true)}>
+                Add User
+              </PrimaryButton>
+            </div>
           </div>
           <Table<User>
             columns={columns}
             data={usersList.users}
             errorMessage="No users Found"
-            isLoading={isLoadingUsers}
+            isLoading={isLoadingUsers || usersList.isLoadingUser}
             tableClassName="mt-5"
             thClassName="h-[40px]"
           />

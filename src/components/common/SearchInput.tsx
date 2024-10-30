@@ -1,5 +1,5 @@
 import React from "react";
-import { Search } from "react-iconly";
+import { Search, Plus } from "react-iconly";
 import { twMerge } from "tailwind-merge";
 
 interface SearchInputProps {
@@ -52,6 +52,20 @@ const SearchInput: React.FC<SearchInputProps> = ({
           color: "#A0AEC0",
         }}
       />
+      {/* want this to be at the end of the icons */}
+      {/* <Plus
+        size={20}
+        style={{
+          height: "1.25rem",
+          width: "1.25rem",
+          position: "absolute",
+          top: "50%",
+          left: "28rem",
+          transform: "translateY(-50%)",
+          color: "#A0AEC0",
+          rotate: "45deg",
+        }}
+      /> */}
     </div>
   );
 };
