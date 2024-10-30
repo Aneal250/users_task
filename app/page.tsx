@@ -2,13 +2,15 @@
 
 import SearchInput from "@components/common/SearchInput";
 import { TableColumn } from "../src/types/table";
-import { User } from "../src/types/data";
+import { AddUser, User } from "../src/types/data";
 import { useGetUsers } from "hooks/useUser";
 import Avatar from "@components/common/Avatar";
 import Table from "@components/Table";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PrimaryButton from "@components/common/PrimaryButton";
 import AddUserModal from "@components/modal/AddUserModal";
+import { useAppSelector, useAppDispatch } from "@lib/hooks";
+import { addUser, fetchUsers, searchUsersByNameOrEmail, users } from "../src/features/usersSlice";
 
 export default function Home() {
   const { data: usersData, isLoading: isLoadingUsers } = useGetUsers();
@@ -49,16 +51,35 @@ export default function Home() {
     },
   ];
 
-  const [users, setUsers] = useState<User[]>([]);
+  const dispatch = useAppDispatch();
 
-  const handleAddUser = (user) => {
-    setUsers((prevUsers) => [...prevUsers, user]);
+  const usersList = useAppSelector(users);
+
+   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+
+  // help me fix this
+    const handleSearch = (value: string) => {
+      setSearch(value); // Update search state immediately
+
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+
+      searchTimeoutRef.current = setTimeout(() => {
+        dispatch(searchUsersByNameOrEmail(value));
+      }, 300);
+    };
+
+  const handleAddUser = (user: AddUser) => {
+    dispatch(addUser(user)); 
     setShowAddUserModal(false);
   };
 
   useEffect(() => {
-    setUsers(usersData);
-  }, [usersData]);
+    if (usersData) {
+      dispatch(fetchUsers(usersData)); 
+    }
+  }, [dispatch, usersData]);
+
 
   return (
     <>
@@ -77,8 +98,8 @@ export default function Home() {
             <SearchInput
               placeholder="Search by name"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              // className="w-full"
+              onChange={(e) => handleSearch(e.target.value)}
+              
             />
 
             <PrimaryButton onClick={() => setShowAddUserModal(true)}>
@@ -87,7 +108,7 @@ export default function Home() {
           </div>
           <Table<User>
             columns={columns}
-            data={users}
+            data={usersList.users}
             errorMessage="No users Found"
             isLoading={isLoadingUsers}
             tableClassName="mt-5"

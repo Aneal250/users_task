@@ -29,3 +29,12 @@ export interface User {
 }
 
 export type UsersRes = User[];
+
+export interface AddUser {
+  name: string;
+  username: string;
+  email: string;
+  address: string;
+  phone: string;
+  company: string;
+}
