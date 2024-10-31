@@ -15,6 +15,7 @@ import {
   fetchUsers,
   searchUsersByNameOrEmail,
   users,
+  clearSearch,
 } from "../src/features/usersSlice";
 import UserModal from "@components/modal/UserModal";
 
@@ -90,6 +91,22 @@ export default function Home() {
 
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // const handleSearch = (value: string) => {
+  //   setSearch(value);
+
+  //   if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+
+  //   searchTimeoutRef.current = setTimeout(() => {
+  //     if (value.trim()) {
+  //       // Search if value is non-empty
+  //       dispatch(searchUsersByNameOrEmail(value));
+  //     } else {
+  //       // Fetch all users if search is cleared
+  //       if (usersData) dispatch(fetchUsers(usersData));
+  //     }
+  //   }, 300);
+  // };
+
   const handleSearch = (value: string) => {
     setSearch(value);
 
@@ -97,11 +114,9 @@ export default function Home() {
 
     searchTimeoutRef.current = setTimeout(() => {
       if (value.trim()) {
-        // Search if value is non-empty
         dispatch(searchUsersByNameOrEmail(value));
       } else {
-        // Fetch all users if search is cleared
-        if (usersData) dispatch(fetchUsers(usersData));
+        dispatch(clearSearch()); // Clears search to show all users
       }
     }, 300);
   };
@@ -111,13 +126,13 @@ export default function Home() {
     setShowAddUserModal(false);
   };
 
-  // Clear search and reset users data
-  const clearSearch = () => {
-    setSearch("");
-    if (usersData) {
-      dispatch(fetchUsers(usersData));
-    }
-  };
+  // // Clear search and reset users data
+  // const clearSearch = () => {
+  //   setSearch("");
+  //   if (usersData) {
+  //     dispatch(fetchUsers(usersData));
+  //   }
+  // };
 
   useEffect(() => {
     if (usersData) {
@@ -143,8 +158,8 @@ export default function Home() {
         />
       )}
 
-      <div className="h-screen mx-auto bg-grey-bg px-8 py-12">
-        <div className=" rounded-[15px] bg-white px-8 py-4">
+      <div className="h-screen mx-auto bg-grey-bg w-full md:pt-8 pt-2 ">
+        <div className=" rounded-[15px] bg-white px-8 py-4 max-w-[1300px] mx-auto">
           <p className="font-semibold">All Users</p>
           <div className="mt-6 flex items-center justify-center">
             <SearchInput
@@ -157,7 +172,10 @@ export default function Home() {
               {/* please help me implement clear search properly */}
               {search.trim().length > 0 && (
                 <PrimaryButton
-                  onClick={clearSearch}
+                  onClick={() => {
+                    setSearch("");
+                    dispatch(clearSearch());
+                  }}
                   variant="blueOutline"
                   className=""
                 >
@@ -171,7 +189,11 @@ export default function Home() {
           </div>
           <Table<User>
             columns={columns}
-            data={usersList.users}
+            data={
+              usersList.filteredUsers
+                ? usersList.filteredUsers
+                : usersList.users
+            }
             errorMessage="No users Found"
             isLoading={isLoadingUsers || usersList.isLoadingUser}
             tableClassName="mt-5"
