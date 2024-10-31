@@ -1,45 +1,100 @@
-## Tests for User Search Functionality
+# Next.js Assignment
 
-This document outlines the tests for the user search functionality in the Next.js application. The tests cover the primary objectives and bonus objectives mentioned in the `assignment.md` file.
+## Overview
 
-### Test Cases
+This project is a simple Next.js application built with TypeScript, TailwindCSS, and React. Your task is to implement a **search feature** for users and display the search results in a table. Additionally, you will need to provide options to **clear the search results**, **view detailed user information**, and **add new users** through a modal form.
 
-#### 1. Search Input
+## Assignment Tasks 
 
-- **Test Case 1.1**: Verify that the search input field is rendered at the top of the user table.
-- **Test Case 1.2**: Verify that typing in the search input filters users by name.
-- **Test Case 1.3**: Verify that typing in the search input filters users by email.
-- **Test Case 1.4**: Verify that debouncing is implemented to avoid triggering too many search requests.
+### Primary Objective: User Search Functionality
 
-#### 2. Displaying Search Results
+1. **Search Input**:
 
-- **Test Case 2.1**: Verify that the table updates to display only the users that match the search term (by name or email).
-- **Test Case 2.2**: Verify that a message "No users found" is displayed when no users match the search term.
+- Add a search input field at the top of the user table.
+- Allow the user to type in the search input to filter users by **name** or **email**.
+- Implement debouncing (optional but recommended) to avoid triggering too many search requests as the user types.
 
-#### 3. Clear Search
+2. **Displaying Search Results**:
 
-- **Test Case 3.1**: Verify that the "Clear Search" button or option is rendered near the search input field.
-- **Test Case 3.2**: Verify that clicking the "Clear Search" button clears the search input.
-- **Test Case 3.3**: Verify that clicking the "Clear Search" button restores the table to show all users.
+- When the user enters a search query, update the table to display only the users that match the search term (by name or email).
+- If no users match the search term, display a message such as "No users found."
 
-#### 4. State Management
+3. **Clear Search**:
 
-- **Test Case 4.1**: Verify that user data is stored in the component state or context.
-- **Test Case 4.2**: Verify that the state is updated based on the search query.
-- **Test Case 4.3**: Verify that the state is updated when the search is cleared.
+- Add a "Clear Search" button or option near the search input field.
+- When this button is clicked, clear the search input and restore the table to show all users.
 
-### Bonus Tests
+4. **State Management**:
 
-#### 5. Styling
+- Store the user data in the component state or context.
+- Update the state based on the search query and clear search actions.
 
-- **Test Case 5.1**: Verify that the search input, table, and clear button are styled using TailwindCSS.
-- **Test Case 5.2**: Verify that the layout is responsive and looks good on different screen sizes.
+### Additional Tasks for the Assignment
 
-#### 6. User Experience Enhancements
+1. **Detailed User View**:
 
-- **Test Case 6.1**: Verify that debouncing is implemented for the search input (e.g., wait 300ms after the user stops typing before applying the search).
-- **Test Case 6.2**: Verify that a loading indicator is displayed when fetching user data or when the search query is being processed.
+- Implement a user-friendly modal or separate page that displays detailed information about a user when their name is clicked in the user table.
 
-#### 7. Performance Considerations
+2. **Adding New Users**:
 
-- **Test Case 7.1**: Verify that memoization or other techniques are used to optimize the search functionality and avoid unnecessary re-renders.
+- Implement a modal form using React Hook Form to add new users to the table.
+- Ensure the form includes fields for the user's name, email, and any other relevant information.
+- Use Zod for form validation and display appropriate error messages for invalid inputs.
+- When the form is submitted, add the new user to the table and update the component state or context.
+- Provide an option to close the modal without submitting the form, and ensure the modal can be closed by clicking outside of it or by pressing the escape key.
+
+### Additional Enhancements (Optional)
+
+- **User Avatar**: Add an avatar image next to each user's name in the table to make the UI more visually appealing.
+- **Pagination**: Implement pagination for the user table to handle large datasets efficiently.
+- **Sorting**: Allow sorting of users by name or email by clicking on the table headers.
+- **React Query Setup**: If you're willing, please set up React Query for handling services.
+
+These enhancements are not mandatory but can help you stand out and impress us! 🌟
+
+### Bonus Objectives:
+
+- **Styling**:
+
+  - Ensure that the search input, table, and clear button are styled using TailwindCSS.
+  - The layout should be responsive and look good on different screen sizes.
+
+- **User Experience Enhancements**:
+
+  - Implement **debouncing** for the search input to delay the search until the user stops typing (for example, wait 300ms after the user stops typing before applying the search).
+  - Use a **loading indicator** when fetching user data or when the search query is being processed.
+
+- **Performance Considerations**:
+
+  - Optimize the search functionality by using **memoization** or other techniques to avoid unnecessary re-renders.
+
+- **Unit tests**
+  - Implement unit tests.
+
+### Data Source
+
+You can use static mock data or fetch the user list from an external API such as [JSONPlaceholder Users](https://jsonplaceholder.typicode.com/users). Make sure the table is populated with users, and the search functionality works on this dataset.
+
+## Project Structure
+
+The project should follow the following structure.
+
+```bash
+.
+├── app             # Next.js pages
+├── src             # Source files
+│   ├── public      # Public assets (images, fonts, etc.)
+│   ├── styles      # Tailwind CSS config and global styles
+│   ├── types       # TypeScript interfaces and types
+│   ├── schemas     # Zod schemas
+│   ├── lib         # Utility functions
+│   ├── hooks       # Custom hooks
+│   ├── services    # Services
+└── docs            # Documentation
+```
+
+### Explanation:
+
+- **Primary Objective**: The assignment focuses on implementing a search feature for filtering users and providing the ability to clear the search results.
+- **Bonus Objectives**: Includes optional tasks such as debouncing the search input, adding a loading indicator, and ensuring responsiveness using TailwindCSS.
+- **Review Criteria**: Outlines the key areas you will evaluate during the code review: code quality, completeness, responsiveness, state management, and performance.
